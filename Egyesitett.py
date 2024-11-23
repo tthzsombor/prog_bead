@@ -9,26 +9,32 @@ from sklearn.linear_model import LinearRegression
 class PlotApp:
     def __init__(self, root):
         self.root = root
+        # Ablak címének megadása
         self.root.title("Népességi adatok")
+        self.root.configure(bg="#f0f0f0")  # Világos háttérszín az ablaknak
 
         # Keret az ábra megjelenítésére
-        self.frame = tk.Frame(self.root)
-        self.frame.pack(fill=tk.BOTH, expand=True)
+        self.frame = tk.Frame(self.root, bg="#ffffff", bd=10, relief="solid", padx=20, pady=20)  # Keret szín és vastagság
+        self.frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)  # Tömörítés az ablak és a keret között
+
 
         # Gombok kerete
-        self.button_frame = tk.Frame(self.root)
-        self.button_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        self.button_frame = tk.Frame(self.root, bg="#f0f0f0")  # világos háttérszín
+        self.button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=20)  # Tömörítés a keret és az ablak alja között
 
         # Gombok hozzáadása
-        self.prev_button = tk.Button(
-            self.button_frame, text="Előző", command=self.prev_plot)
-        self.prev_button.pack(side=tk.LEFT, padx=5, pady=5)
-        self.next_button = tk.Button(
-            self.button_frame, text="Következő", command=self.next_plot)
-        self.next_button.pack(side=tk.RIGHT, padx=5, pady=5)
+        self.prev_button = tk.Button(self.button_frame, text="Előző", command=self.prev_plot,
+                                    font=('Arial', 12, 'bold'), bg='#007BFF', fg='white', relief="flat", bd=0,
+                                    padx=15, pady=10, activebackground='#0056b3', activeforeground='white', width=10)
+        self.prev_button.pack(side=tk.LEFT, padx=20)
+
+        self.next_button = tk.Button(self.button_frame, text="Következő", command=self.next_plot,
+                                    font=('Arial', 12, 'bold'), bg='#28a745', fg='white', relief="flat", bd=0,
+                                    padx=15, pady=10, activebackground='#218838', activeforeground='white', width=10)
+        self.next_button.pack(side=tk.RIGHT, padx=20)
+
 
         # Ábrák
-        # Ezt egészítheted ki több ábrával is.
         self.figures = [self.Nepesseg(), self.Atlageletkor()]
         self.current_page = 0
 
@@ -161,9 +167,9 @@ class PlotApp:
         # Y tengely lépkedése
         ax.set_yticks(np.arange(2, 12, step=0.5))
 
-        ax.set_title('Népesség száma nemek szerint')
-        ax.set_xlabel('Év')
-        ax.set_ylabel('Népesség (millió fő)')
+        ax.set_title('Népesség száma nemek szerint', fontsize=30, fontweight='bold')
+        ax.set_xlabel('Év', fontsize=20)  # X tengely felirat formázása
+        ax.set_ylabel('Népesség (millió fő)', fontsize=20)  # Y tengely felirat formázása
         ax.set_xlim([data_cleaned['Év'].min(), 2110])
         ax.set_xticks(np.arange(data_cleaned['Év'].min(), 2110, step=10))
         ax.legend()
@@ -287,9 +293,10 @@ class PlotApp:
         # Y-tengely címkék 0-tól 50-ig, 5-ös léptékkel
         ax.set_yticks(np.arange(20, 57, step=2))
 
-        ax.set_title('Népesség átlag életkora nemek szerint')
-        ax.set_xlabel('Év')
-        ax.set_ylabel('Életkor')
+
+        ax.set_title('Népesség átlag életkora nemek szerint', fontsize=30, fontweight='bold')
+        ax.set_xlabel('Év', fontsize=20)  # X tengely felirat formázása
+        ax.set_ylabel('Életkor', fontsize=20)  # Y tengely felirat formázása
         ax.set_xlim([data_cleaned['Év'].min(), 2110])
         ax.set_xticks(np.arange(data_cleaned['Év'].min(), 2110, step=10))
         ax.legend()
