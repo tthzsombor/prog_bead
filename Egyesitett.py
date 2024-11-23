@@ -37,16 +37,20 @@ class PlotApp:
 
     def Nepesseg(self):
         # Az adatok betöltése a feltöltött fájlból
-        data = pd.read_csv('nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
+        data = pd.read_csv(
+            'nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
         # Az első sor kihagyása (fejléc), és az oszlopok kiválasztása
         data_cleaned = data.iloc[1:, [0, 1, 2, 3]]
-        data_cleaned.columns = ['Év', 'Férfi', 'Nő', 'Összesen']  # Az oszlopok átnevezése
+        data_cleaned.columns = ['Év', 'Férfi', 'Nő',
+                                'Összesen']  # Az oszlopok átnevezése
 
         # Az oszlopok numerikus típusúvá alakítása
         data_cleaned['Év'] = pd.to_numeric(data_cleaned['Év'], errors='coerce')
         for col in ['Férfi', 'Nő', 'Összesen']:
-            data_cleaned[col] = data_cleaned[col].str.replace(' ', '').apply(pd.to_numeric, errors='coerce')
+            data_cleaned[col] = data_cleaned[col].str.replace(
+                ' ', '').apply(pd.to_numeric, errors='coerce')
 
+        # NAN törlése az adatok közül
         data_cleaned = data_cleaned.dropna()
 
         # Adatok osztása 1000-rel (millió fő)
@@ -67,56 +71,78 @@ class PlotApp:
 
         # Predikció a 2050-es évre
         year_2050 = np.array([[2050]])
-        prediction_férfi_2050 = models['Férfi'].predict(year_2050)[0]  # Ne osszuk le itt
-        prediction_nő_2050 = models['Nő'].predict(year_2050)[0]  # Ne osszuk le itt
-        prediction_összesen_2050 = models['Összesen'].predict(year_2050)[0]  # Ne osszuk le itt
+        prediction_férfi_2050 = models['Férfi'].predict(
+            year_2050)[0]  # Ne osszuk le itt
+        prediction_nő_2050 = models['Nő'].predict(
+            year_2050)[0]  # Ne osszuk le itt
+        prediction_összesen_2050 = models['Összesen'].predict(year_2050)[
+            0]  
+        
+        
+        
+        # Predikció a 2030-es évre
+        year_2030 = np.array([[2030]])
+        prediction_férfi_2030 = models['Férfi'].predict(year_2030)[0] 
+        prediction_nő_2030 = models['Nő'].predict(year_2030)[0] 
+        prediction_összesen_2030 = models['Összesen'].predict(year_2030)[0]  
+        
+        
 
         # Ábra létrehozása
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.scatter(x, y_férfi, color='blue', label='Férfiak')
         ax.scatter(x, y_nő, color='red', label='Nők')
         ax.scatter(x, y_összesen, color='purple', label='Összesen')
-        
-        
+
         # Legnagyobb értékek dinamikus keresése
         max_férfi_value = data_cleaned['Férfi'].max()
         max_nő_value = data_cleaned['Nő'].max()
         max_összesen_value = data_cleaned['Összesen'].max()
 
         # A legnagyobb értékekhez tartozó évek keresése
-        max_férfi_year = data_cleaned[data_cleaned['Férfi'] == max_férfi_value]['Év'].values[0]
-        max_nő_year = data_cleaned[data_cleaned['Nő'] == max_nő_value]['Év'].values[0]
-        max_összesen_year = data_cleaned[data_cleaned['Összesen'] == max_összesen_value]['Év'].values[0]
+        max_férfi_year = data_cleaned[data_cleaned['Férfi']
+                                      == max_férfi_value]['Év'].values[0]
+        max_nő_year = data_cleaned[data_cleaned['Nő']
+                                   == max_nő_value]['Év'].values[0]
+        max_összesen_year = data_cleaned[data_cleaned['Összesen']
+                                         == max_összesen_value]['Év'].values[0]
 
-        
-        
-         # A legnagyobb értékek kiemelése
-        ax.scatter([max_férfi_year], [max_férfi_value], color='orange', s=50, label=f'Legmagasabb férfi népesség({max_férfi_year})')
-        ax.scatter([max_nő_year], [max_nő_value], color='green', s=50, label=f'Legmagasabb női népesség({max_nő_year})')
-        ax.scatter([max_összesen_year], [max_összesen_value], color='yellow', s=50, label=f'Legmagasabb népesség összesen({max_összesen_year})')
+        # A legnagyobb értékek kiemelése
+        ax.scatter([max_férfi_year], [max_férfi_value], color='orange',
+                   s=50, label=f'Legmagasabb férfi népesség({max_férfi_year})')
+        ax.scatter([max_nő_year], [max_nő_value], color='green',
+                   s=50, label=f'Legmagasabb női népesség({max_nő_year})')
+        ax.scatter([max_összesen_year], [max_összesen_value], color='yellow',
+                   s=50, label=f'Legmagasabb népesség összesen({max_összesen_year})')
 
-            
-
-        # Hozzáadás regressziós vonalak (NE osszuk le a modell előrejelzéseit)
+        # Hozzáadás regressziós vonalak
         for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'purple'], [y_férfi, y_nő, y_összesen]):
-            ax.plot(x, models[key].predict(x), color=color, linestyle='-', label=f'{key} regresszió')
+            ax.plot(x, models[key].predict(x), color=color,
+                    linestyle='-', label=f'{key} regresszió')
 
         # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
-        ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.1f}', color='blue',
-                ha='left', va='bottom', fontsize=15)
-        ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red',
-                ha='left', va='bottom', fontsize=15)
-        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='purple',
-                ha='left', va='bottom', fontsize=15)
+        ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.1f}', color='blue', ha='left', va='bottom', fontsize=15)
+        ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red', ha='left', va='bottom', fontsize=15)
+        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='purple', ha='left', va='bottom', fontsize=15)
+        
+        
+        # 2030-es predikciók megjelenítése közvetlenül az adatpontok mellett
+        ax.text(2030, prediction_férfi_2030, f'{prediction_férfi_2030:.1f}', color='blue', ha='left', va='bottom', fontsize=15)
+        ax.text(2030, prediction_nő_2030, f'{prediction_nő_2030:.1f}', color='red', ha='left', va='bottom', fontsize=15)
+        ax.text(2030, prediction_összesen_2030, f'{prediction_összesen_2030:.1f}', color='purple', ha='left', va='bottom', fontsize=15)
 
         # 2050-es évre vonatkozó előrejelzések kiírása
-        ax.scatter([2050], [prediction_férfi_2050], color='blue', s=40)  # Férfiak 2050
-        ax.scatter([2050], [prediction_nő_2050], color='red', s=40)  # Nők 2050
-        ax.scatter([2050], [prediction_összesen_2050], color='purple', s=40)  # Összesen 2050
+        ax.scatter([2050], [prediction_férfi_2050],color='blue', s=40) 
+        ax.scatter([2050], [prediction_nő_2050], color='red', s=40)  
+        ax.scatter([2050], [prediction_összesen_2050],color='purple', s=40)  
         
         
+        # 2050-es évre vonatkozó előrejelzések kiírása
+        ax.scatter([2030], [prediction_férfi_2030],color='blue', s=40) 
+        ax.scatter([2030], [prediction_nő_2030], color='red', s=40)  
+        ax.scatter([2030], [prediction_összesen_2030],color='purple', s=40) 
+
         # Y tengely lépkedése
-        
         ax.set_yticks(np.arange(2, 11, step=0.5))
 
         ax.set_title('Népesség száma nemek szerint')
@@ -125,13 +151,13 @@ class PlotApp:
         ax.set_xlim([data_cleaned['Év'].min(), 2070])
         ax.set_xticks(np.arange(data_cleaned['Év'].min(), 2060, step=10))
         ax.axvline(x=2050, color='black', linestyle='-')
+        ax.axvline(x=2030, color='black', linestyle='-')
         ax.legend()
         ax.grid(True)
         return fig
 
-
-
     # masodik
+
     def Atlageletkor(self):
         # Az adatok betöltése a feltöltött fájlból
         data = pd.read_csv(
@@ -172,6 +198,13 @@ class PlotApp:
         prediction_férfi_2050 = models['Férfi'].predict(year_2050)[0]
         prediction_nő_2050 = models['Nő'].predict(year_2050)[0]
         prediction_összesen_2050 = models['Összesen'].predict(year_2050)[0]
+        
+        
+        # Predikció a 2030-es évre
+        year_2030 = np.array([[2030]])  # 2050-es év numpy array formában
+        prediction_férfi_2030 = models['Férfi'].predict(year_2030)[0]
+        prediction_nő_2030 = models['Nő'].predict(year_2030)[0]
+        prediction_összesen_2030 = models['Összesen'].predict(year_2030)[0]
 
         # Ábra létrehozása
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -198,6 +231,23 @@ class PlotApp:
         ax.scatter([2050], [prediction_nő_2050], color='red', s=30)  # Nők 2050
         ax.scatter([2050], [prediction_összesen_2050],
                    color='purple', s=30)  # Összesen 2050
+        
+        
+        # 2030-es predikciók megjelenítése közvetlenül az adatpontok mellett
+        ax.text(2030, prediction_férfi_2030, f'{prediction_férfi_2030:.1f}', color='blue',
+                ha='left', va='bottom', fontsize=15)
+        ax.text(2030, prediction_nő_2030, f'{prediction_nő_2030:.1f}', color='red',
+                ha='left', va='bottom', fontsize=15)
+        ax.text(2030, prediction_összesen_2030, f'{prediction_összesen_2030:.1f}', color='purple',
+                ha='left', va='bottom', fontsize=15)
+
+        # 2050-es évre vonatkozó előrejelzések kiírása
+        ax.scatter([2030], [prediction_férfi_2030],
+                   color='blue', s=30)  # Férfiak 2050
+        ax.scatter([2030], [prediction_nő_2030], color='red', s=30)  # Nők 2050
+        ax.scatter([2030], [prediction_összesen_2030],
+                   color='purple', s=30)  # Összesen 2050
+        
 
         # Y tengely lépkedése
         ax.set_yticks(np.arange(int(data_cleaned['Férfi'].min()), int(
@@ -211,6 +261,7 @@ class PlotApp:
         ax.set_xlim([data_cleaned['Év'].min(), 2060])
         ax.set_xticks(np.arange(data_cleaned['Év'].min(), 2060, step=10))
         ax.axvline(x=2050, color='black', linestyle='-')
+        ax.axvline(x=2030, color='black', linestyle='-')
         ax.legend()
         ax.grid(True)
         return fig
