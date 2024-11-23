@@ -75,10 +75,30 @@ class PlotApp:
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.scatter(x, y_férfi, color='blue', label='Férfiak')
         ax.scatter(x, y_nő, color='red', label='Nők')
-        ax.scatter(x, y_összesen, color='green', label='Összesen')
+        ax.scatter(x, y_összesen, color='purple', label='Összesen')
+        
+        
+        # Legnagyobb értékek dinamikus keresése
+        max_férfi_value = data_cleaned['Férfi'].max()
+        max_nő_value = data_cleaned['Nő'].max()
+        max_összesen_value = data_cleaned['Összesen'].max()
+
+        # A legnagyobb értékekhez tartozó évek keresése
+        max_férfi_year = data_cleaned[data_cleaned['Férfi'] == max_férfi_value]['Év'].values[0]
+        max_nő_year = data_cleaned[data_cleaned['Nő'] == max_nő_value]['Év'].values[0]
+        max_összesen_year = data_cleaned[data_cleaned['Összesen'] == max_összesen_value]['Év'].values[0]
+
+        
+        
+         # A legnagyobb értékek kiemelése
+        ax.scatter([max_férfi_year], [max_férfi_value], color='orange', s=50, label=f'Legmagasabb férfi népesség({max_férfi_year})')
+        ax.scatter([max_nő_year], [max_nő_value], color='green', s=50, label=f'Legmagasabb női népesség({max_nő_year})')
+        ax.scatter([max_összesen_year], [max_összesen_value], color='yellow', s=50, label=f'Legmagasabb népesség összesen({max_összesen_year})')
+
+            
 
         # Hozzáadás regressziós vonalak (NE osszuk le a modell előrejelzéseit)
-        for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'green'], [y_férfi, y_nő, y_összesen]):
+        for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'purple'], [y_férfi, y_nő, y_összesen]):
             ax.plot(x, models[key].predict(x), color=color, linestyle='-', label=f'{key} regresszió')
 
         # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
@@ -86,13 +106,13 @@ class PlotApp:
                 ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red',
                 ha='left', va='bottom', fontsize=15)
-        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='green',
+        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='purple',
                 ha='left', va='bottom', fontsize=15)
 
         # 2050-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2050], [prediction_férfi_2050], color='blue', s=40)  # Férfiak 2050
         ax.scatter([2050], [prediction_nő_2050], color='red', s=40)  # Nők 2050
-        ax.scatter([2050], [prediction_összesen_2050], color='green', s=40)  # Összesen 2050
+        ax.scatter([2050], [prediction_összesen_2050], color='purple', s=40)  # Összesen 2050
         
         
         # Y tengely lépkedése
@@ -157,10 +177,10 @@ class PlotApp:
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.scatter(x, y_férfi, color='blue', label='Férfiak')
         ax.scatter(x, y_nő, color='red', label='Nők')
-        ax.scatter(x, y_összesen, color='green', label='Összesen')
+        ax.scatter(x, y_összesen, color='purple', label='Összesen')
 
         # Hozzáadás regressziós vonalak
-        for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'green'], [y_férfi, y_nő, y_összesen]):
+        for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'purple'], [y_férfi, y_nő, y_összesen]):
             ax.plot(x, models[key].predict(x), color=color,
                     linestyle='-', label=f'{key} regresszió')
 
@@ -169,7 +189,7 @@ class PlotApp:
                 ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red',
                 ha='left', va='bottom', fontsize=15)
-        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='green',
+        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='purple',
                 ha='left', va='bottom', fontsize=15)
 
         # 2050-es évre vonatkozó előrejelzések kiírása
@@ -177,7 +197,7 @@ class PlotApp:
                    color='blue', s=30)  # Férfiak 2050
         ax.scatter([2050], [prediction_nő_2050], color='red', s=30)  # Nők 2050
         ax.scatter([2050], [prediction_összesen_2050],
-                   color='green', s=30)  # Összesen 2050
+                   color='purple', s=30)  # Összesen 2050
 
         # Y tengely lépkedése
         ax.set_yticks(np.arange(int(data_cleaned['Férfi'].min()), int(
