@@ -37,20 +37,21 @@ class PlotApp:
 
     def Nepesseg(self):
         # Az adatok betöltése a feltöltött fájlból
-        data = pd.read_csv(
-            'nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
+        data = pd.read_csv('nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
         # Az első sor kihagyása (fejléc), és az oszlopok kiválasztása
         data_cleaned = data.iloc[1:, [0, 1, 2, 3]]
-        data_cleaned.columns = ['Év', 'Férfi', 'Nő',
-                                'Összesen']  # Az oszlopok átnevezése
+        data_cleaned.columns = ['Év', 'Férfi', 'Nő', 'Összesen']  # Az oszlopok átnevezése
 
         # Az oszlopok numerikus típusúvá alakítása
         data_cleaned['Év'] = pd.to_numeric(data_cleaned['Év'], errors='coerce')
         for col in ['Férfi', 'Nő', 'Összesen']:
-            data_cleaned[col] = data_cleaned[col].str.replace(
-                ' ', '').apply(pd.to_numeric, errors='coerce')
+            data_cleaned[col] = data_cleaned[col].str.replace(' ', '').apply(pd.to_numeric, errors='coerce')
 
         data_cleaned = data_cleaned.dropna()
+
+        # Adatok osztása 1000-rel (millió fő)
+        for col in ['Férfi', 'Nő', 'Összesen']:
+            data_cleaned[col] = data_cleaned[col] / 1000
 
         # Regresszió a különböző oszlopokra
         x = data_cleaned['Év'].values.reshape(-1, 1)
@@ -66,9 +67,9 @@ class PlotApp:
 
         # Predikció a 2050-es évre
         year_2050 = np.array([[2050]])
-        prediction_férfi_2050 = models['Férfi'].predict(year_2050)[0]
-        prediction_nő_2050 = models['Nő'].predict(year_2050)[0]
-        prediction_összesen_2050 = models['Összesen'].predict(year_2050)[0]
+        prediction_férfi_2050 = models['Férfi'].predict(year_2050)[0]  # Ne osszuk le itt
+        prediction_nő_2050 = models['Nő'].predict(year_2050)[0]  # Ne osszuk le itt
+        prediction_összesen_2050 = models['Összesen'].predict(year_2050)[0]  # Ne osszuk le itt
 
         # Ábra létrehozása
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -76,30 +77,31 @@ class PlotApp:
         ax.scatter(x, y_nő, color='red', label='Nők')
         ax.scatter(x, y_összesen, color='green', label='Összesen')
 
-        # Hozzáadás regressziós vonalak
+        # Hozzáadás regressziós vonalak (NE osszuk le a modell előrejelzéseit)
         for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'green'], [y_férfi, y_nő, y_összesen]):
-            ax.plot(x, models[key].predict(x), color=color,
-                    linestyle='-', label=f'{key} regresszió')
-            
-        
-         # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
+            ax.plot(x, models[key].predict(x), color=color, linestyle='-', label=f'{key} regresszió')
+
+        # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
         ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.1f}', color='blue',
                 ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red',
                 ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='green',
                 ha='left', va='bottom', fontsize=15)
-        
+
         # 2050-es évre vonatkozó előrejelzések kiírása
-        ax.scatter([2050], [prediction_férfi_2050],
-                   color='blue', s=40,)  # Férfiak 2050
+        ax.scatter([2050], [prediction_férfi_2050], color='blue', s=40)  # Férfiak 2050
         ax.scatter([2050], [prediction_nő_2050], color='red', s=40)  # Nők 2050
-        ax.scatter([2050], [prediction_összesen_2050],
-                   color='green', s=40)  # Összesen 2050
+        ax.scatter([2050], [prediction_összesen_2050], color='green', s=40)  # Összesen 2050
+        
+        
+        # Y tengely lépkedése
+        
+        ax.set_yticks(np.arange(2, 11, step=0.5))
 
         ax.set_title('Népesség száma nemek szerint')
         ax.set_xlabel('Év')
-        ax.set_ylabel('Népesség (ezer fő)')
+        ax.set_ylabel('Népesség (millió fő)')
         ax.set_xlim([data_cleaned['Év'].min(), 2070])
         ax.set_xticks(np.arange(data_cleaned['Év'].min(), 2060, step=10))
         ax.axvline(x=2050, color='black', linestyle='-')
