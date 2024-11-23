@@ -9,7 +9,7 @@ from sklearn.linear_model import LinearRegression
 class PlotApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Népesség adatok")
+        self.root.title("Népességi adatok")
 
         # Keret az ábra megjelenítésére
         self.frame = tk.Frame(self.root)
@@ -84,31 +84,32 @@ class PlotApp:
         
          # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
         ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.1f}', color='blue',
-                ha='left', va='bottom', fontsize=10)
+                ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red',
-                ha='left', va='bottom', fontsize=10)
+                ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='green',
-                ha='left', va='bottom', fontsize=10)
+                ha='left', va='bottom', fontsize=15)
         
         # 2050-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2050], [prediction_férfi_2050],
-                   color='blue', s=30)  # Férfiak 2050
-        ax.scatter([2050], [prediction_nő_2050], color='red', s=30)  # Nők 2050
+                   color='blue', s=40,)  # Férfiak 2050
+        ax.scatter([2050], [prediction_nő_2050], color='red', s=40)  # Nők 2050
         ax.scatter([2050], [prediction_összesen_2050],
-                   color='green', s=30)  # Összesen 2050
+                   color='green', s=40)  # Összesen 2050
 
         ax.set_title('Népesség száma nemek szerint')
         ax.set_xlabel('Év')
         ax.set_ylabel('Népesség (ezer fő)')
-        ax.set_xlim([data_cleaned['Év'].min(), 2060])
+        ax.set_xlim([data_cleaned['Év'].min(), 2070])
         ax.set_xticks(np.arange(data_cleaned['Év'].min(), 2060, step=10))
         ax.axvline(x=2050, color='black', linestyle='-')
         ax.legend()
         ax.grid(True)
         return fig
 
-    # masodik
 
+
+    # masodik
     def Atlageletkor(self):
         # Az adatok betöltése a feltöltött fájlból
         data = pd.read_csv(
@@ -163,11 +164,11 @@ class PlotApp:
 
         # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
         ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.1f}', color='blue',
-                ha='left', va='bottom', fontsize=10)
+                ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red',
-                ha='left', va='bottom', fontsize=10)
+                ha='left', va='bottom', fontsize=15)
         ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='green',
-                ha='left', va='bottom', fontsize=10)
+                ha='left', va='bottom', fontsize=15)
 
         # 2050-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2050], [prediction_férfi_2050],
