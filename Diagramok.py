@@ -228,7 +228,7 @@ class PlotApp:
 
  
  
-                 # Predikció a 2050-es évre
+        # Predikció a 2050-es évre
         year_2050 = np.array([[2050]])
         prediction_férfi_2050 = models['Férfi'].predict(year_2050)[0]  # Ne osszuk le itt
         prediction_nő_2050 = models['Nő'].predict(year_2050)[0]  # Ne osszuk le itt
@@ -289,7 +289,6 @@ class PlotApp:
 
         # Y tengely lépkedése
         ax.set_yticks(np.arange(int(data_cleaned['Férfi'].min()), int(prediction_összesen_2050) + 1, step=2))
-        # Y-tengely címkék 0-tól 50-ig, 5-ös léptékkel
         ax.set_yticks(np.arange(20, 57, step=2))
 
 
@@ -314,6 +313,8 @@ class PlotApp:
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.pack(fill=tk.BOTH, expand=True)
         canvas.draw()
+
+
 
     def next_plot(self):
         self.current_page = (self.current_page + 1) % len(self.figures)
