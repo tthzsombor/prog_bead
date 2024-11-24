@@ -97,6 +97,10 @@ class PlotApp:
         ax.scatter([max_nő_year], [max_nő_value], color='green',s=50, label=f'Legmagasabb női népesség({max_nő_year})')
         ax.scatter([max_összesen_year], [max_összesen_value], color='yellow',s=50, label=f'Legmagasabb népesség összesen({max_összesen_year})')
 
+
+        ax.axhline(y=max_összesen_value, color='black', linestyle='--', label=f'Legnagyobb összes népesség: {max_összesen_value} M')
+
+        
         # Hozzáadás regressziós vonalak
         for key, color, y in zip(['Férfi', 'Nő', 'Összesen'], ['blue', 'red', 'purple'], [y_férfi, y_nő, y_összesen]):
             ax.plot(x, models[key].predict(x), color=color,linestyle='-', label=f'{key} regresszió')
@@ -133,7 +137,7 @@ class PlotApp:
         # 2030-es predikciók megjelenítése közvetlenül az adatpontok mellett
         ax.text(2030, prediction_férfi_2030, f'{prediction_férfi_2030:.1f}', color='blue', ha='left', va='bottom', fontsize=15)
         ax.text(2030, prediction_nő_2030, f'{prediction_nő_2030:.1f}', color='red', ha='left', va='bottom', fontsize=15)
-        ax.text(2030, prediction_összesen_2030, f'{prediction_összesen_2030:.1f}', color='purple', ha='left', va='bottom', fontsize=15)
+        ax.text(2030, prediction_összesen_2030, f'{prediction_összesen_2030:.1f}', color='purple', ha='left', va='top', fontsize=15)
         
         # 2030-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2030], [prediction_férfi_2030],color='blue', s=40) 
