@@ -9,8 +9,7 @@ from sklearn.linear_model import LinearRegression
 class PlotApp:
     def __init__(self, root):
         self.root = root
-        # Ablak címének megadása
-        self.root.title("Népességi adatok")
+        self.root.title("Népességi adatok") # Ablak címének megadása
         self.root.configure(bg="#f0f0f0")  # Világos háttérszín az ablaknak
 
         # Keret az ábra megjelenítésére
@@ -40,11 +39,11 @@ class PlotApp:
 
         # Első ábra megjelenítése
         self.show_plot(self.figures[self.current_page])
+        
 
     def Nepesseg(self):
         # Az adatok betöltése a feltöltött fájlból
-        data = pd.read_csv(
-            'nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
+        data = pd.read_csv('nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
         # Az első sor kihagyása (fejléc), és az oszlopok kiválasztása
         data_cleaned = data.iloc[1:, [0, 1, 2, 3]]
         data_cleaned.columns = ['Év', 'Férfi', 'Nő',
@@ -57,7 +56,7 @@ class PlotApp:
                 ' ', '').apply(pd.to_numeric, errors='coerce')
 
         # NAN törlése az adatok közül
-        data_cleaned = data_cleaned.dropna()
+        data_cleaned = data_cleaned.dropna()    
 
         # Adatok osztása 1000-rel (millió fő)
         for col in ['Férfi', 'Nő', 'Összesen']:
@@ -302,6 +301,8 @@ class PlotApp:
         ax.legend()
         ax.grid(True)
         return fig
+
+
 
     def show_plot(self, fig):
         # Törli a korábbi tartalmat
