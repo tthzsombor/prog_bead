@@ -99,6 +99,29 @@ class PlotApp:
 
 
         ax.axhline(y=max_összesen_value, color='black', linestyle='--', label=f'Legnagyobb összes népesség: {max_összesen_value} M')
+       
+       
+        # Férfi népesség vonal 2030-tól
+        ax.hlines(
+            y=max_férfi_value,  # Y koordináta: férfi népesség maximuma
+            xmin=2030,          # X tengely kezdőértéke
+            xmax=2100,          # X tengely végértéke
+            colors='blue',
+            linestyles='--',
+            label=f'Legnagyobb férfi népesség: {max_férfi_value} M'
+        )
+
+        # Női népesség vonal 2030-tól
+        ax.hlines(
+            y=max_nő_value,     # Y koordináta: női népesség maximuma
+            xmin=2030,          # X tengely kezdőértéke
+            xmax=2100,          # X tengely végértéke
+            colors='red',
+            linestyles='--',
+            label=f'Legnagyobb női népesség: {max_nő_value} M'
+        )
+
+
 
         
         # Hozzáadás regressziós vonalak
@@ -114,9 +137,9 @@ class PlotApp:
         prediction_összesen_2050 = models['Összesen'].predict(year_2050)[0]  
         
         # 2050-es predikciók megjelenítése közvetlenül az adatpontok mellett
-        ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.1f}', color='blue', ha='left', va='bottom', fontsize=15)
-        ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.1f}', color='red', ha='left', va='bottom', fontsize=15)
-        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.1f}', color='purple', ha='left', va='bottom', fontsize=15)
+        ax.text(2050, prediction_férfi_2050, f'{prediction_férfi_2050:.3f}', color='blue', ha='left', va='top', fontsize=15)
+        ax.text(2050, prediction_nő_2050, f'{prediction_nő_2050:.3f}', color='red', ha='left', va='bottom', fontsize=15)
+        ax.text(2050, prediction_összesen_2050, f'{prediction_összesen_2050:.3f}', color='purple', ha='left', va='bottom', fontsize=15)
         
         # 2050-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2050], [prediction_férfi_2050],color='blue', s=40) 
@@ -135,9 +158,9 @@ class PlotApp:
         prediction_összesen_2030 = models['Összesen'].predict(year_2030)[0]  
         
         # 2030-es predikciók megjelenítése közvetlenül az adatpontok mellett
-        ax.text(2030, prediction_férfi_2030, f'{prediction_férfi_2030:.1f}', color='blue', ha='left', va='bottom', fontsize=15)
-        ax.text(2030, prediction_nő_2030, f'{prediction_nő_2030:.1f}', color='red', ha='left', va='bottom', fontsize=15)
-        ax.text(2030, prediction_összesen_2030, f'{prediction_összesen_2030:.1f}', color='purple', ha='left', va='top', fontsize=15)
+        ax.text(2030, prediction_férfi_2030, f'{prediction_férfi_2030:.3f}', color='blue', ha='left', va='top', fontsize=15)
+        ax.text(2030, prediction_nő_2030, f'{prediction_nő_2030:.3f}', color='red', ha='left', va='bottom', fontsize=15)
+        ax.text(2030, prediction_összesen_2030, f'{prediction_összesen_2030:.3f}', color='purple', ha='left', va='top', fontsize=15)
         
         # 2030-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2030], [prediction_férfi_2030],color='blue', s=40) 
@@ -154,9 +177,9 @@ class PlotApp:
         prediction_összesen_2100 = models['Összesen'].predict(year_2100)[0]  
         
         # 2100-es predikciók megjelenítése közvetlenül az adatpontok mellett
-        ax.text(2100, prediction_férfi_2100, f'{prediction_férfi_2100:.1f}', color='blue', ha='left', va='bottom', fontsize=15)
-        ax.text(2100, prediction_nő_2100, f'{prediction_nő_2100:.1f}', color='red', ha='left', va='bottom', fontsize=15)
-        ax.text(2100, prediction_összesen_2100, f'{prediction_összesen_2100:.1f}', color='purple', ha='left', va='bottom', fontsize=15)
+        ax.text(2100, prediction_férfi_2100, f'{prediction_férfi_2100:.3f}', color='blue', ha='left', va='bottom', fontsize=15)
+        ax.text(2100, prediction_nő_2100, f'{prediction_nő_2100:.3f}', color='red', ha='left', va='bottom', fontsize=15)
+        ax.text(2100, prediction_összesen_2100, f'{prediction_összesen_2100:.3f}', color='purple', ha='left', va='bottom', fontsize=15)
         
         # 2100-es évre vonatkozó előrejelzések kiírása
         ax.scatter([2100], [prediction_férfi_2100],color='blue', s=40) 
@@ -243,7 +266,19 @@ class PlotApp:
             text.set_fontweight('bold')
         
 
-    
+         # Dinamikus különbség kiszámítása
+        if férfiak_száma > nők_száma:
+            különbség = férfiak_száma - nők_száma
+            szöveg = f"A férfiak száma {különbség:,.0f}-el több, mint a nőké."
+        else:
+            különbség = nők_száma - férfiak_száma
+            szöveg = f"A nők száma {különbség:,.0f}-el több, mint a férfiaké."
+
+        # Szöveg hozzáadása az ábrához
+        ax.text(0, -1.3, szöveg, fontsize=14, ha='center', va='center', fontweight='bold')
+
+        
+        
         # Cím beállítása nagyobb betűmérettel
         ax.set_title(f'Népesség aránya {int(current_year)}-ben', fontsize=30, fontweight='bold')
 
@@ -365,7 +400,7 @@ class PlotApp:
         ax.set_yticks(np.arange(20, 57, step=2))
 
 
-        ax.set_title('Népesség átlag életkora nemek szerint', fontsize=30, fontweight='bold')
+        ax.set_title('Népesség átlagos életkora nemek szerint', fontsize=30, fontweight='bold')
         ax.set_xlabel('Év', fontsize=20)  # X tengely felirat formázása
         ax.set_ylabel('Életkor', fontsize=20)  # Y tengely felirat formázása
         ax.set_xlim([data_cleaned['Év'].min(), 2110])
@@ -410,13 +445,15 @@ class PlotApp:
 
         # Oszlopdiagram készítése
         fig, ax = plt.subplots(figsize=(6, 6))  # Az oszlopdiagram méretének beállítása
-        categories = ['Férfiak', 'Nők', 'Átlagosan']
+        categories = ['Férfiak', 'Nők', 'Átlagosan/\nÖsszesen']
         values = [férfiak_száma, nők_száma, atlagosan_szama]
         colors = ['blue', 'red', 'purple']  # Az oszlopok színének beállítása
 
-        width = 0.2  
-        x_positions = [0.1,0.3, 0.5]  # Az oszlopok középpontja közvetlen egymás mellett
+        width = 0.1  #Oszlopok szélességei
+        x_positions = [0.4, 0.5, 0.6]  # Oszlopok kezdő értékei
         bars = ax.bar(x_positions, values, color=colors, edgecolor='black', width=width)
+        ax.set_xlim(0, 1)  # X tengely tartománya 0-tól 1-ig
+
 
         # Az oszlopnevek betűméretének beállítása
         ax.set_xticks(x_positions)  # Az X tengelyen az oszlopok helye
@@ -426,22 +463,21 @@ class PlotApp:
         ax.set_title(f'Népesség átlagos életkora {int(current_year)}-ben', fontsize=30, fontweight='bold')
         ax.set_ylabel('Életkor', fontsize=20)
 
-        # A számok hozzáadása az oszlopok tetejére
+        # A számok hozzáadása az oszlopoba
         for bar in bars:
             yval = bar.get_height()
             ax.text(
                 bar.get_x() + bar.get_width() / 2,  
-                yval/2,  
-                f'{yval:,.1f}',  
+                yval/2,  #Oszlopmagassa/2 --> pont középen lesz
+                f'{yval:,.1f} év',  #Értékük egy tizedesjeggyel
                 ha='center', va='bottom', fontsize=20,
             )
 
-        ax.set_yticks(np.arange(0, max(values) + 2, 2))
+        ax.set_yticks(np.arange(0, max(values) + 3, 3))
 
         # A tengelyek betűméretének módosítása
-        ax.tick_params(axis='both', labelsize=12)
+        ax.tick_params(axis='both', labelsize=16)
         
-        ax.set_xlim(0, 1.5)  # Középre igazítjuk az oszlopokat
 
 
         return fig
