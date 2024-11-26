@@ -34,7 +34,7 @@ class PlotApp:
 
 
         # Ábrák
-        self.figures = [self.Nepesseg(), self.Atlageletkor()]
+        self.figures = [self.Nepesseg(), self.Diagram1(),self.Atlageletkor(), self.Diagram2()]
         self.current_page = 0
 
         # Első ábra megjelenítése
@@ -181,6 +181,75 @@ class PlotApp:
 
 
 
+    #Népesség az adott évben kördiagram
+    def Diagram1(self):
+        # Az adatok betöltése a fájlból
+        data = pd.read_csv('nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
+        
+        # Az első sor kihagyása (fejléc), és az oszlopok kiválasztása
+        data_cleaned = data.iloc[1:, [0, 1, 2, 3]]
+        data_cleaned.columns = ['Év', 'Férfi', 'Nő', 'Összesen']
+
+        # Az oszlopok numerikus típusúvá alakítása, és ezerrel szorzás (ha szükséges)
+        data_cleaned['Év'] = pd.to_numeric(data_cleaned['Év'], errors='coerce')
+        for col in ['Férfi', 'Nő', 'Összesen']:
+            data_cleaned[col] = data_cleaned[col].str.replace(
+                ' ', '').apply(pd.to_numeric, errors='coerce') * 1000
+
+        # NAN törlése az adatok közül
+        data_cleaned = data_cleaned.dropna()
+
+        # Az aktuális év adatai
+        current_year = data_cleaned['Év'].max()
+        current_data = data_cleaned[data_cleaned['Év'] == current_year]
+
+        # Ellenőrzés, hogy az év adatai léteznek-e
+        if current_data.empty:
+            print("Az aktuális év adatai nem találhatóak.")
+            return None
+
+        # Férfi és női adatok
+        férfiak_száma = current_data['Férfi'].values[0]
+        nők_száma = current_data['Nő'].values[0]
+
+        # Egyedi formázó függvény a szeletek szövegének testreszabásához
+        def custom_autopct(pct, all_values):
+            absolute = int(round(pct / 100. * sum(all_values)))
+            formatted_absolute = f"{absolute:,.0f}".replace(",", ".")
+            return f"{pct:.1f}%\n({formatted_absolute})"
+
+        # Kördiagram készítése
+        fig, ax = plt.subplots(figsize=(8, 8))  # Nagyobb méretű ábra
+        labels = ['Férfiak', 'Nők']
+        sizes = [férfiak_száma, nők_száma]
+        colors = ['blue', 'red']
+
+        wedges, texts, autotexts = ax.pie(
+            sizes,
+            labels=labels,
+            autopct=lambda pct: custom_autopct(pct, sizes),
+            startangle=90,
+            colors=colors,
+            wedgeprops={'edgecolor': 'black', 'linewidth': 1},
+            textprops={'fontsize': 14}  # Alap betűméret a címkékhez
+        )
+
+        # A szeletek százalékos és abszolút értékeinek betűmérete
+        for autotext in autotexts:
+            autotext.set_fontsize(16)  # Nagyobb betűméret a szeletek szövegéhez
+            
+        for text in texts:
+            text.set_fontsize(20)
+            text.set_fontweight('bold')
+        
+
+    
+        # Cím beállítása nagyobb betűmérettel
+        ax.set_title(f'Népesség aránya {int(current_year)}-ben', fontsize=30, fontweight='bold')
+
+        return fig
+
+
 
     # masodik
     def Atlageletkor(self):
@@ -305,6 +374,77 @@ class PlotApp:
         ax.grid(True)
         return fig
 
+
+
+    def Diagram2(self):
+        # Az adatok betöltése a fájlból
+        data = pd.read_csv('nepesseg.csv', encoding='ISO-8859-2', delimiter=';')
+        
+        # Az első sor kihagyása (fejléc), és az oszlopok kiválasztása
+        data_cleaned = data.iloc[1:, [0, 4, 5, 6]]
+        data_cleaned.columns = ['Év', 'Férfi', 'Nő', 'Átlagosan']
+        
+        # Az oszlopok numerikus típusúvá alakítása
+        data_cleaned['Év'] = pd.to_numeric(data_cleaned['Év'], errors='coerce')
+        for col in ['Férfi', 'Nő', 'Átlagosan']:
+            data_cleaned[col] = (data_cleaned[col]
+                                .replace('..', np.nan)
+                                .str.replace(' ', '', regex=False)
+                                .str.replace(',', '.', regex=False)
+                                .astype(float))
+        
+        # NAN törlés
+        data_cleaned = data_cleaned.dropna()
+
+        # Az aktuális év adatai
+        current_year = data_cleaned['Év'].max()
+        current_data = data_cleaned[data_cleaned['Év'] == current_year]
+        
+        if current_data.empty:
+            print("Az aktuális év adatai nem találhatóak.")
+            return None
+
+        férfiak_száma = current_data['Férfi'].values[0]
+        nők_száma = current_data['Nő'].values[0]
+        atlagosan_szama=current_data['Átlagosan'].values[0]
+
+        # Oszlopdiagram készítése
+        fig, ax = plt.subplots(figsize=(6, 6))  # Az oszlopdiagram méretének beállítása
+        categories = ['Férfiak', 'Nők', 'Átlagosan']
+        values = [férfiak_száma, nők_száma, atlagosan_szama]
+        colors = ['blue', 'red', 'purple']  # Az oszlopok színének beállítása
+
+        width = 0.2  
+        x_positions = [0.1,0.3, 0.5]  # Az oszlopok középpontja közvetlen egymás mellett
+        bars = ax.bar(x_positions, values, color=colors, edgecolor='black', width=width)
+
+        # Az oszlopnevek betűméretének beállítása
+        ax.set_xticks(x_positions)  # Az X tengelyen az oszlopok helye
+        ax.set_xticklabels(categories, fontsize=20)
+
+        # Az oszlopok címkézése (értékek hozzáadása az oszlopok tetejére)
+        ax.set_title(f'Népesség átlagos életkora {int(current_year)}-ben', fontsize=30, fontweight='bold')
+        ax.set_ylabel('Életkor', fontsize=20)
+
+        # A számok hozzáadása az oszlopok tetejére
+        for bar in bars:
+            yval = bar.get_height()
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,  
+                yval/2,  
+                f'{yval:,.1f}',  
+                ha='center', va='bottom', fontsize=20,
+            )
+
+        ax.set_yticks(np.arange(0, max(values) + 2, 2))
+
+        # A tengelyek betűméretének módosítása
+        ax.tick_params(axis='both', labelsize=12)
+        
+        ax.set_xlim(0, 1.5)  # Középre igazítjuk az oszlopokat
+
+
+        return fig
 
 
     def show_plot(self, fig):
